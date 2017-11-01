@@ -2,7 +2,7 @@
 set -e
 
 if [ -z "$CRON_SCHEDULE" ]; then
-    echo "WARNING: $CRON_SCHEDULE not set!"
+    echo "WARNING: \$CRON_SCHEDULE not set!"
 fi
 
 # Write cron schedule
