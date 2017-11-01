@@ -1,4 +1,4 @@
-FROM heyman/postgresql
+FROM heyman/postgresql:9.4.1
 MAINTAINER Jonatan Heyman <http://heyman.info>
 
 RUN apt-get update && apt-get install -y \
