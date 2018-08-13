@@ -24,6 +24,7 @@ Optional environment variables
 * :code:`MAIL_FROM`
 * :code:`WEBHOOK`: If specified, an HTTP request will be sent to this URL
 * :code:`WEBHOOK_METHOD`: By default the webhook's HTTP method is GET, but can be changed using this variable
+* :code:`KEEP_BACKUP_DAYS`: The number of days to keep backups for when pruning old backups
 
 Restoring a backup
 ==================

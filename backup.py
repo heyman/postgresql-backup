@@ -15,6 +15,7 @@ MAIL_TO = os.environ.get("MAIL_TO")
 MAIL_FROM = os.environ.get("MAIL_FROM")
 WEBHOOK = os.environ.get("WEBHOOK")
 WEBHOOK_METHOD = os.environ.get("WEBHOOK_METHOD") or "GET"
+KEEP_BACKUP_DAYS = int(os.environ.get("KEEP_BACKUP_DAYS", 7))
 
 dt = datetime.now()
 file_name = DB_NAME + "_" + dt.strftime("%Y-%m-%d")
@@ -51,7 +52,7 @@ def upload_backup():
     cmd("aws s3 cp %s %s" % (backup_file, S3_PATH))
 
 def prune_local_backup_files():
-    cmd("find %s -type f -prune -mtime +7 -exec rm -f {} \;" % BACKUP_DIR)
+    cmd("find %s -type f -prune -mtime +%i -exec rm -f {} \;" % (BACKUP_DIR, KEEP_BACKUP_DAYS))
 
 def send_email(to_address, from_address, subject, body):
     """
