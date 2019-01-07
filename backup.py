@@ -50,6 +50,7 @@ def take_backup():
 
 def upload_backup():
     cmd("aws s3 cp %s %s" % (backup_file, S3_PATH))
+    cmd("rm %s" % (backup_file))
 
 def prune_local_backup_files():
     cmd("find %s -type f -prune -mtime +%i -exec rm -f {} \;" % (BACKUP_DIR, KEEP_BACKUP_DAYS))
