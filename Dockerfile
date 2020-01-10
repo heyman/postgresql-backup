@@ -19,4 +19,4 @@ ADD . /backup
 
 ENTRYPOINT ["/backup/entrypoint.sh"]
 
-CMD crond -f -d 8
+CMD crond -f -l 2
