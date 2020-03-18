@@ -49,7 +49,7 @@ def take_backup():
     cmd("env PGPASSWORD=%s pg_dump -Fc -h %s -U %s %s > %s" % (DB_PASS, DB_HOST, DB_USER, DB_NAME, backup_file))
 
 def upload_backup():
-    cmd("aws s3 cp %s %s" % (backup_file, S3_PATH))
+    cmd("aws s3 cp --storage-class=STANDARD_IA %s %s" % (backup_file, S3_PATH))
 
 def prune_local_backup_files():
     cmd("find %s -type f -prune -mtime +%i -exec rm -f {} \;" % (BACKUP_DIR, KEEP_BACKUP_DAYS))
