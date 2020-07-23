@@ -16,6 +16,7 @@ Required environment variables
 * :code:`AWS_ACCESS_KEY_ID`
 * :code:`AWS_SECRET_ACCESS_KEY`
 * :code:`AWS_DEFAULT_REGION`
+* :code:`DBS`: List of DB connection configs separated with comma in form :code:`<DB_NAME>:<DB_USER>:<DB_PASS>` (e.g.: :code:`db1:user1:pass1,db2:user2:pass2`). If this variable is not empty, DB_NAME, DB_USER, DB_PASS variables are ignored. Backup will be created for each specified database.
 
 Optional environment variables
 ==============================
