@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-if [ -z "$CRON_SCHEDULE" ]; then
+if [[ $@ == crond* ]] && [ -z "$CRON_SCHEDULE" ]; then
     echo "ERROR: \$CRON_SCHEDULE not set!"
     exit 1
 fi
