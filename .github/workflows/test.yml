@@ -12,9 +12,6 @@ jobs:
       matrix:
         include:
           - {version: '13', os: ubuntu-latest}
-          - {version: '12', os: ubuntu-latest}
-          - {version: '11', os: ubuntu-latest}
-          - {version: '10', os: ubuntu-latest}
 
     services:
       postgres:
