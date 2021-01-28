@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/heyman/postgresql-backup/workflows/Test/badge.svg)](https://github.com/heyman/postgresql-backup/actions?query=workflow%3ATest)
 
-Docker image that runs a cron job which dumps a Postgres database, and uploads it to an Amazon S3 bucket.
+Docker image that periodically dumps a Postgres database, and uploads it to an Amazon S3 bucket.
 
 ## Required environment variables
 
@@ -22,8 +22,12 @@ Docker image that runs a cron job which dumps a Postgres database, and uploads i
 * `MAIL_FROM`
 * `WEBHOOK`: If specified, an HTTP request will be sent to this URL
 * `WEBHOOK_METHOD`: By default the webhook's HTTP method is GET, but can be changed using this variable
-* `KEEP_BACKUP_DAYS`: The number of days to keep backups for when pruning old backups
+* `KEEP_BACKUP_DAYS`: The number of days to keep backups for when pruning old backups. Defaults to `7`.
 * `FILENAME`: String that is passed into `strftime()` and used as the backup dump's filename. Defaults to `$DB_NAME_%Y-%m-%d`.
+
+## Volumes
+
+* `/data/backups` - The database is dumped in into this directory
 
 ## Restoring a backup
 
