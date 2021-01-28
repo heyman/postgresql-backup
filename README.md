@@ -1,5 +1,7 @@
 # Docker PostgreSQL Backup
 
+[![Build Status](https://github.com/heyman/postgresql-backup/workflows/Test/badge.svg)](https://github.com/heyman/postgresql-backup/actions?query=workflow%3ATest)
+
 Docker image that runs a cron job which dumps a Postgres database, and uploads it to an Amazon S3 bucket.
 
 ## Required environment variables
