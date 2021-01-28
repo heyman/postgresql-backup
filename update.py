@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import subprocess
 
 
 # versions will be a list of all #, ## and ##.## directories
@@ -18,5 +19,8 @@ for version in versions:
     for file_name in os.listdir("template"):
         if file_name == "Dockerfile.template":
             continue
-        shutil.copyfile(os.path.join("template", file_name), os.path.join(version, file_name))
+        
+        # we use system cp in order to preserve file permissions
+        p = subprocess.Popen(['cp', os.path.join("template", file_name), os.path.join(version, file_name)])
+        p.wait()
 
