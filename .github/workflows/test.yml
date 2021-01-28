@@ -5,7 +5,6 @@ jobs:
   tests:
     name: ${{ matrix.version }}
     runs-on: ${{ matrix.os }}
-    environment: tests
   
     strategy:
       fail-fast: false
