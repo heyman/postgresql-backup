@@ -26,15 +26,16 @@ Docker image that runs a cron job which dumps a Postgres database, and uploads i
 ## Restoring a backup
 
 This image can also be run as a one off task to restore one of the backups. 
-To do this, we run the container with the command: `/backup/restore.sh [S3-filename]`.
+To do this, we run the container with the command: `python -u /backup/restore.py [S3-filename]` 
+(`S3-filename` should only be the name of the file, the directory is set through the `S3_PATH` env variable).
 
 The following environment variables are required:
 
 * `DB_HOST`: Postgres hostname
 * `DB_PASS`: Postgres password
 * `DB_USER`: Postgres username
-* `DB_NAME`: Name of database
-* `S3_PATH`: Amazon S3 path in the format: s3://bucket-name/some/path
+* `DB_NAME`: Name of database to import into
+* `S3_PATH`: Amazon S3 directory path in the format: s3://bucket-name/some/path
 * `AWS_ACCESS_KEY_ID`
 * `AWS_SECRET_ACCESS_KEY`
 * `AWS_DEFAULT_REGION`
