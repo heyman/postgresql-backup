@@ -1,0 +1,130 @@
+name: Test
+on: [push, pull_request]
+
+jobs:
+  tests:
+    name: ${{ matrix.version }}
+    runs-on: ${{ matrix.os }}
+    environment: tests
+  
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {version: '10', os: ubuntu-latest}
+          - {version: '13', os: ubuntu-latest}
+
+    services:
+      postgres:
+        image: postgres:${{ matrix.version }}
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: test
+          POSTGRES_DB: test_${{ matrix.version }}
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+
+    steps:
+      - name: Create Test Data
+        uses: heyman/docker-run-action@docker-networks
+        with:
+          image: postgres:${{ matrix.version }}
+          run: >
+            psql -d test_${{ matrix.version }} -U test -h postgres -p ${{ job.services.postgres.ports[5432] }} -c '
+              CREATE TABLE books (
+                id serial PRIMARY KEY,
+                name VARCHAR ( 128 ) UNIQUE NOT NULL,
+                author VARCHAR (128 ) NOT NULL
+              );
+              INSERT INTO books (name, author) VALUES
+                ($$Fittstim$$, $$Linda Skugge$$),
+                ($$DSM-5$$, $$American Psychiatric Association$$);
+            '
+          options: >
+            -e PGPASSWORD=test
+      
+      - uses: actions/checkout@v2
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v2
+        with:
+          tags: heyman/postgresql-backup:latest
+          push: false
+          context: ${{ matrix.version }}
+      
+      - name: Take Backup
+        uses: heyman/docker-run-action@docker-networks
+        with:
+          image: heyman/postgresql-backup:latest
+          run: python -u /backup/backup.py
+          options: >
+            -e DB_HOST=postgres
+            -e DB_PASS=test
+            -e DB_USER=test
+            -e DB_NAME=test_${{ matrix.version }}
+            -e S3_PATH=s3://test-postgresql-backup/backups
+            -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            -e AWS_DEFAULT_REGION=us-east-1
+            -e FILENAME=test_${{ matrix.version }}
+      
+      - name: Clear DB table
+        uses: heyman/docker-run-action@docker-networks
+        with:
+          image: postgres:${{ matrix.version }}
+          run: >
+            psql -d test_${{ matrix.version }} -U test -h postgres -p ${{ job.services.postgres.ports[5432] }} -c '
+              DROP TABLE books;
+            '
+          options: >
+            -e PGPASSWORD=test
+      
+      - name: Check that table was actually removed
+        uses: heyman/docker-run-action@docker-networks
+        with:
+          image: postgres:${{ matrix.version }}
+          shell: bash
+          run: >
+            [[ "0" == `psql -d test_${{ matrix.version }} -U test -h postgres -p ${{ job.services.postgres.ports[5432] }} -A -t -c '
+                SELECT count(*) FROM pg_catalog.pg_tables WHERE tablename=$$books$$;
+              '` ]]
+          options: >
+            -e PGPASSWORD=test
+      
+      - name: Restore Backup
+        uses: heyman/docker-run-action@docker-networks
+        with:
+          image: heyman/postgresql-backup:latest
+          run: python -u /backup/restore.py test_${{ matrix.version }}
+          options: >
+            -e DB_HOST=postgres
+            -e DB_PASS=test
+            -e DB_USER=test
+            -e DB_NAME=test_${{ matrix.version }}
+            -e S3_PATH=s3://test-postgresql-backup/backups
+            -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            -e AWS_DEFAULT_REGION=us-east-1
+      
+      - name: Check that table got imported
+        uses: heyman/docker-run-action@docker-networks
+        with:
+          image: postgres:${{ matrix.version }}
+          shell: bash
+          run: >
+            [[ "1" == `psql -d test_${{ matrix.version }} -U test -h postgres -p ${{ job.services.postgres.ports[5432] }} -A -t -c '
+                SELECT count(*) FROM pg_catalog.pg_tables WHERE tablename=$$books$$;
+              '` ]]
+          options: >
+            -e PGPASSWORD=test
+      
+      - name: Remove S3 file
+        uses: heyman/docker-run-action@docker-networks
+        with:
+          image: heyman/postgresql-backup:latest
+          run: aws s3 rm s3://test-postgresql-backup/backups/test_${{ matrix.version }}
+          options: >
+            -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            -e AWS_DEFAULT_REGION=us-east-1
