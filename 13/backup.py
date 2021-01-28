@@ -66,7 +66,7 @@ def send_email(to_address, from_address, subject, body):
     })
 
 def log(msg):
-    print "[%s]: %s" % (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), msg)
+    print("[%s]: %s" % (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), msg))
 
 def main():
     start_time = datetime.now()
