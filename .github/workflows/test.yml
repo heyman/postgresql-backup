@@ -115,6 +115,8 @@ jobs:
           run: >
             [[ "1" == `psql -d test_${{ matrix.version }} -U test -h postgres -p ${{ job.services.postgres.ports[5432] }} -A -t -c '
                 SELECT count(*) FROM pg_catalog.pg_tables WHERE tablename=$$books$$;
+              '` ]] && [[ "Fittstim" == `psql -d test_${{ matrix.version }} -U test -h postgres -p ${{ job.services.postgres.ports[5432] }} -A -t -c '
+                SELECT name FROM books WHERE author=$$Linda Skugge$$;
               '` ]]
           options: >
             -e PGPASSWORD=test
