@@ -21,6 +21,7 @@ Docker image that runs a cron job which dumps a Postgres database, and uploads i
 * `WEBHOOK`: If specified, an HTTP request will be sent to this URL
 * `WEBHOOK_METHOD`: By default the webhook's HTTP method is GET, but can be changed using this variable
 * `KEEP_BACKUP_DAYS`: The number of days to keep backups for when pruning old backups
+* `FILENAME`: String that is passed into `strftime()` and used as the backup dump's filename. Defaults to `$DB_NAME_%Y-%m-%d`.
 
 ## Restoring a backup
 

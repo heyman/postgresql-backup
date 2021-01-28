@@ -5,6 +5,8 @@ import subprocess
 import sys
 from datetime import datetime
 
+dt = datetime.now()
+
 BACKUP_DIR = os.environ["BACKUP_DIR"]
 S3_PATH = os.environ["S3_PATH"]
 DB_NAME = os.environ["DB_NAME"]
@@ -16,9 +18,9 @@ MAIL_FROM = os.environ.get("MAIL_FROM")
 WEBHOOK = os.environ.get("WEBHOOK")
 WEBHOOK_METHOD = os.environ.get("WEBHOOK_METHOD") or "GET"
 KEEP_BACKUP_DAYS = int(os.environ.get("KEEP_BACKUP_DAYS", 7))
+FILENAME = os.environ.get("FILENAME", DB_NAME + "_%Y-%m-%d")
 
-dt = datetime.now()
-file_name = DB_NAME + "_" + dt.strftime("%Y-%m-%d")
+file_name = dt.strftime(FILENAME)
 backup_file = os.path.join(BACKUP_DIR, file_name)
 
 if not S3_PATH.endswith("/"):
