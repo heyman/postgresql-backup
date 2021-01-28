@@ -43,3 +43,17 @@ The following environment variables are required:
 To run a one off backup job, e.g. to test that it works when setting it up for the first time, simply start 
 the container with the docker run command set to `python -u backup.py` (as well as all the required environment 
 variables set).
+
+
+## Docker tags
+
+This image uses the alpine version(s) of the [official postgres](https://hub.docker.com/_/postgres) image as base 
+image.
+
+The following docker tags are available for this image, and they are based on the corresponding official postgres 
+alpine image:
+
+* `13`, `latest`
+* `12`
+* `11`
+* `10`
