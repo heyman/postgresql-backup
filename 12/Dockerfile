@@ -1,4 +1,4 @@
-FROM postgres:%(VERSION)s-alpine
+FROM postgres:12-alpine
 
 # Install dependencies
 RUN apk update && apk add --no-cache --virtual .build-deps && apk add \
