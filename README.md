@@ -22,8 +22,18 @@ Docker image that periodically dumps a Postgres database, and uploads it to an A
 * `MAIL_FROM`
 * `WEBHOOK`: If specified, an HTTP request will be sent to this URL
 * `WEBHOOK_METHOD`: By default the webhook's HTTP method is GET, but can be changed using this variable
+* `WEBHOOK_CURL_OPTS`: Add additional headers or other option to curl command calling the webhook. E.g. `-H 'Content-type: application/json'`
+* `WEBHOOK_DATA`: Add a body to the webhook being called, unless changed it implies that `POST` method is used. E.g. `{"text":"Backup completed at %(date)s %(time)s!"}`
 * `KEEP_BACKUP_DAYS`: The number of days to keep backups for when pruning old backups. Defaults to `7`.
 * `FILENAME`: String that is passed into `strftime()` and used as the backup dump's filename. Defaults to `$DB_NAME_%Y-%m-%d`.
+
+### Interpolation
+Text in `WEBHOOK_DATA` is interpolated with variabels `%(my_var)s`
+ - `date`: Date in yyyy-mm-dd format
+ - `time`: Date in hh:mm:ss format
+ - `duration`: Number of seconds take to backup
+ - `filename`: Name of the file uploaded to S3
+ - `size`: Size of the backup file with suitable suffix, like MB, GB, ...
 
 ## Volumes
 
@@ -49,7 +59,7 @@ The following environment variables are required:
 ## Taking a one off backup
 
 To run a one off backup job, e.g. to test that it works when setting it up for the first time, simply start 
-the container with the docker run command set to `python -u backup.py` (as well as all the required environment 
+the container with the docker run command set to `python -u /backup/backup.py` (as well as all the required environment 
 variables set).
 
 

@@ -16,7 +16,9 @@ DB_HOST = os.environ["DB_HOST"]
 MAIL_TO = os.environ.get("MAIL_TO")
 MAIL_FROM = os.environ.get("MAIL_FROM")
 WEBHOOK = os.environ.get("WEBHOOK")
-WEBHOOK_METHOD = os.environ.get("WEBHOOK_METHOD") or "GET"
+WEBHOOK_METHOD = os.environ.get("WEBHOOK_METHOD")
+WEBHOOK_DATA = os.environ.get("WEBHOOK_DATA")
+WEBHOOK_CURL_OPTS = os.environ.get("WEBHOOK_CURL_OPTS") or ""
 KEEP_BACKUP_DAYS = int(os.environ.get("KEEP_BACKUP_DAYS", 7))
 FILENAME = os.environ.get("FILENAME", DB_NAME + "_%Y-%m-%d")
 
@@ -25,6 +27,11 @@ backup_file = os.path.join(BACKUP_DIR, file_name)
 
 if not S3_PATH.endswith("/"):
     S3_PATH = S3_PATH + "/"
+
+if WEBHOOK_DATA and not WEBHOOK_METHOD:
+    WEBHOOK_METHOD = 'POST'
+else:
+    WEBHOOK_METHOD = WEBHOOK_METHOD or 'GET'
 
 def cmd(command):
     try:
@@ -70,29 +77,51 @@ def send_email(to_address, from_address, subject, body):
 def log(msg):
     print("[%s]: %s" % (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), msg))
 
+def pretty_bytes(num):
+    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if num < 1024.0:
+            return "%3.1f %s" % (num, x)
+        num /= 1024.0
+
 def main():
     start_time = datetime.now()
     log("Dumping database")
     take_backup()
+    backup_size=os.path.getsize(backup_file)
+
     log("Uploading to S3")
     upload_backup()
     log("Pruning local backup copies")
     prune_local_backup_files()
-    
+    end_time = datetime.now()
+
+    meta = {
+        "filename": file_name,
+        "date": end_time.strftime("%Y-%m-%d"),
+        "time": end_time.strftime('%H:%M:%S'),
+        "duration": "%.2f" % ((end_time - start_time).total_seconds()),
+        "size": pretty_bytes(backup_size)
+    }
+
     if MAIL_TO and MAIL_FROM:
         log("Sending mail to %s" % MAIL_TO)
         send_email(
             MAIL_TO,
             MAIL_FROM,
             "Backup complete: %s" % DB_NAME,
-            "Took %.2f seconds" % (datetime.now() - start_time).total_seconds(),
+            "Took %(duration)s seconds" % meta,
         )
-    
+
     if WEBHOOK:
+        if WEBHOOK_DATA:
+            opts = "%s -d '%s'" % (WEBHOOK_CURL_OPTS, WEBHOOK_DATA % meta)
+        else:
+            opts = WEBHOOK_CURL_OPTS
+
         log("Making HTTP %s request to webhook: %s" % (WEBHOOK_METHOD, WEBHOOK))
-        cmd("curl -X %s %s" % (WEBHOOK_METHOD, WEBHOOK))
-    
-    log("Backup complete, took %.2f seconds" % (datetime.now() - start_time).total_seconds())
+        cmd("curl -X %s %s %s" % (WEBHOOK_METHOD, opts, WEBHOOK))
+
+    log("Backup complete, took %(duration)s seconds, size %(size)s" % meta)
 
 
 if __name__ == "__main__":
