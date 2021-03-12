@@ -9,6 +9,7 @@ dt = datetime.now()
 
 BACKUP_DIR = os.environ["BACKUP_DIR"]
 S3_PATH = os.environ["S3_PATH"]
+S3_OPTS = os.environ.get("S3_OPTS") or "--storage-class=STANDARD_IA"
 DB_NAME = os.environ["DB_NAME"]
 DB_PASS = os.environ["DB_PASS"]
 DB_USER = os.environ["DB_USER"]
@@ -51,7 +52,7 @@ def take_backup():
     cmd("env PGPASSWORD=%s pg_dump -Fc -h %s -U %s %s > %s" % (DB_PASS, DB_HOST, DB_USER, DB_NAME, backup_file))
 
 def upload_backup():
-    cmd("aws s3 cp --storage-class=STANDARD_IA %s %s" % (backup_file, S3_PATH))
+    cmd("aws s3 cp %s %s %s" % (S3_OPTS, backup_file, S3_PATH))
 
 def prune_local_backup_files():
     cmd("find %s -type f -prune -mtime +%i -exec rm -f {} \;" % (BACKUP_DIR, KEEP_BACKUP_DAYS))
