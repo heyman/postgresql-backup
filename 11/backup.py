@@ -18,7 +18,7 @@ MAIL_FROM = os.environ.get("MAIL_FROM")
 WEBHOOK = os.environ.get("WEBHOOK")
 WEBHOOK_METHOD = os.environ.get("WEBHOOK_METHOD")
 WEBHOOK_DATA = os.environ.get("WEBHOOK_DATA")
-WEBHOOK_CURL_OPTS = os.environ.get("WEBHOOK_CURL_OPTS") or ""
+WEBHOOK_CURL_OPTIONS = os.environ.get("WEBHOOK_CURL_OPTIONS") or ""
 KEEP_BACKUP_DAYS = int(os.environ.get("KEEP_BACKUP_DAYS", 7))
 FILENAME = os.environ.get("FILENAME", DB_NAME + "_%Y-%m-%d")
 
@@ -114,9 +114,9 @@ def main():
 
     if WEBHOOK:
         if WEBHOOK_DATA:
-            opts = "%s -d '%s'" % (WEBHOOK_CURL_OPTS, WEBHOOK_DATA % meta)
+            opts = "%s -d '%s'" % (WEBHOOK_CURL_OPTIONS, WEBHOOK_DATA % meta)
         else:
-            opts = WEBHOOK_CURL_OPTS
+            opts = WEBHOOK_CURL_OPTIONS
 
         log("Making HTTP %s request to webhook: %s" % (WEBHOOK_METHOD, WEBHOOK))
         cmd("curl -X %s %s %s" % (WEBHOOK_METHOD, opts, WEBHOOK))
