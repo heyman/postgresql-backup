@@ -35,6 +35,17 @@ Text in `WEBHOOK_DATA` is interpolated with variabels `%(my_var)s`
  - `filename`: Name of the file uploaded to S3
  - `size`: Size of the backup file with suitable suffix, like MB, GB, ...
 
+ ### Send mesages to a Slack webhook.
+
+ Configure a webhook using the Slack's [documentation](https://api.slack.com/messaging/webhooks). Set `WEBHOOK` and `WEBHOOK_` accodringly. 
+
+```
+WEBHOOK=https://hooks.slack.com/services/.../.../...
+WEBHOOK_METHOD=POST
+WEBHOOK_CURL_OPTS=-H 'Content-type: application/json'
+WEBHOOK_DATA={"text":":white_check_mark: Backup completed at %(date)s %(time)s\nDuration: %(duration)s seconds\nUpload: %(filename)s: %(size)s"}
+ ```
+
 ## Volumes
 
 * `/data/backups` - The database is dumped in into this directory
