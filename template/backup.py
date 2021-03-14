@@ -8,13 +8,23 @@ from datetime import datetime
 dt = datetime.now()
 
 BACKUP_DIR = os.environ["BACKUP_DIR"]
+
 S3_PATH = os.environ["S3_PATH"]
 S3_STORAGE_CLASS = os.environ.get("S3_STORAGE_CLASS") or "STANDARD_IA"
 S3_EXTRA_OPTIONS = os.environ.get("S3_EXTRA_OPTIONS") or ""
-DB_NAME = os.environ["DB_NAME"]
-DB_PASS = os.environ["DB_PASS"]
-DB_USER = os.environ["DB_USER"]
-DB_HOST = os.environ["DB_HOST"]
+
+DB_USE_ENV = os.environ.get("DB_USE_ENV") or False
+DB_NAME = os.environ["DB_NAME"] if "DB_NAME" in os.environ else os.environ.get("PGDATABASE")
+
+if not DB_NAME:
+    raise Exception("DB_NAME must be set")
+
+if not DB_USE_ENV:
+    DB_HOST = os.environ["DB_HOST"]
+    DB_PASS = os.environ["DB_PASS"]
+    DB_USER = os.environ["DB_USER"]
+    DB_PORT = os.environ.get("DB_PORT") or "5432"
+
 MAIL_TO = os.environ.get("MAIL_TO")
 MAIL_FROM = os.environ.get("MAIL_FROM")
 WEBHOOK = os.environ.get("WEBHOOK")
@@ -35,9 +45,9 @@ if WEBHOOK_DATA and not WEBHOOK_METHOD:
 else:
     WEBHOOK_METHOD = WEBHOOK_METHOD or 'GET'
 
-def cmd(command):
+def cmd(command, **kwargs):
     try:
-        subprocess.check_output([command], shell=True, stderr=subprocess.STDOUT)
+        subprocess.check_output([command], shell=True, stderr=subprocess.STDOUT, **kwargs)
     except subprocess.CalledProcessError as e:
         sys.stderr.write("\n".join([
             "Command execution failed. Output:",
@@ -52,12 +62,14 @@ def backup_exists():
     return os.path.exists(backup_file)
 
 def take_backup():
-    #if backup_exists():
-    #    sys.stderr.write("Backup file already exists!\n")
-    #    sys.exit(1)
-    
+    env = os.environ.copy()
+    if DB_USE_ENV:
+        env.update({key: os.environ[key] for key in os.environ.keys() if key.startswith('PG') })
+    else:
+        env.update({'PGPASSWORD': DB_PASS, 'PGHOST': DB_HOST, 'PGUSER': DB_USER, 'PGDATABASE': DB_NAME, 'PGPORT': DB_PORT})
+
     # trigger postgres-backup
-    cmd("env PGPASSWORD=%s pg_dump -Fc -h %s -U %s %s > %s" % (DB_PASS, DB_HOST, DB_USER, DB_NAME, backup_file))
+    cmd("pg_dump -Fc > %s" % backup_file, env=env)
 
 def upload_backup():
     opts = "--storage-class=%s %s" % (S3_STORAGE_CLASS, S3_EXTRA_OPTIONS)
