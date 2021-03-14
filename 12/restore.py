@@ -7,6 +7,7 @@ from datetime import datetime
 
 BACKUP_DIR = os.environ["BACKUP_DIR"]
 S3_PATH = os.environ["S3_PATH"]
+S3_EXTRA_OPTIONS = os.environ.get("S3_EXTRA_OPTIONS") or ""
 DB_NAME = os.environ["DB_NAME"]
 DB_PASS = os.environ["DB_PASS"]
 DB_USER = os.environ["DB_USER"]
@@ -49,7 +50,7 @@ def restore_backup():
     ))
 
 def download_backup():
-    cmd("aws s3 cp %s%s %s" % (S3_PATH, file_name, backup_file))
+    cmd("aws s3 cp %s %s%s %s" % (S3_EXTRA_OPTIONS, S3_PATH, file_name, backup_file))
 
 def log(msg):
     print "[%s]: %s" % (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), msg)
