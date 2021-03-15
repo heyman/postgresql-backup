@@ -36,7 +36,7 @@ jobs:
 
     steps:
       - name: Create Test Data
-        uses: heyman/docker-run-action@docker-networks
+        uses: addnab/docker-run-action@docker-networks
         with:
           image: postgres:${{ matrix.version }}
           run: >
@@ -54,7 +54,7 @@ jobs:
             -e PGPASSWORD=test
       
       - name: Create S3 bucket
-        uses: heyman/docker-run-action@docker-networks
+        uses: addnab/docker-run-action@docker-networks
         with:
           image: amazon/aws-cli
           run: aws --endpoint-url=http://s3:8000 s3api create-bucket --bucket test-postgresql-backup; aws --endpoint-url=http://s3:8000 s3 ls
@@ -73,7 +73,7 @@ jobs:
           context: ${{ matrix.version }}
       
       - name: Take Backup
-        uses: heyman/docker-run-action@docker-networks
+        uses: addnab/docker-run-action@docker-networks
         with:
           image: heyman/postgresql-backup:latest
           run: python -u /backup/backup.py
@@ -90,7 +90,7 @@ jobs:
             -e FILENAME=test_${{ matrix.version }}
       
       - name: Clear DB table
-        uses: heyman/docker-run-action@docker-networks
+        uses: addnab/docker-run-action@docker-networks
         with:
           image: postgres:${{ matrix.version }}
           run: >
@@ -101,7 +101,7 @@ jobs:
             -e PGPASSWORD=test
       
       - name: Check that table was actually removed
-        uses: heyman/docker-run-action@docker-networks
+        uses: addnab/docker-run-action@docker-networks
         with:
           image: postgres:${{ matrix.version }}
           shell: bash
@@ -113,7 +113,7 @@ jobs:
             -e PGPASSWORD=test
       
       - name: Restore Backup
-        uses: heyman/docker-run-action@docker-networks
+        uses: addnab/docker-run-action@docker-networks
         with:
           image: heyman/postgresql-backup:latest
           run: python -u /backup/restore.py test_${{ matrix.version }}
@@ -129,7 +129,7 @@ jobs:
             -e AWS_DEFAULT_REGION=us-east-1
       
       - name: Check that table got imported
-        uses: heyman/docker-run-action@docker-networks
+        uses: addnab/docker-run-action@docker-networks
         with:
           image: postgres:${{ matrix.version }}
           shell: bash
