@@ -59,7 +59,7 @@ jobs:
           image: amazon/aws-cli
           run: aws --endpoint-url=http://s3:8000 s3api create-bucket --bucket test-bucket
           options: >
-            -it 
+            --tty
             -e AWS_ACCESS_KEY_ID=access_key
             -e AWS_SECRET_ACCESS_KEY=secret
       
