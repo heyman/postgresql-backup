@@ -25,6 +25,14 @@ jobs:
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+      s3:
+        image: zenko/cloudserver
+        env:
+          ENDPOINT: s3
+          S3BACKEND: mem
+          REMOTE_MANAGEMENT_DISABLE: 1
+          SCALITY_ACCESS_KEY_ID: access_key
+          SCALITY_SECRET_ACCESS_KEY: secret
 
     steps:
       - name: Create Test Data
@@ -44,6 +52,15 @@ jobs:
             '
           options: >
             -e PGPASSWORD=test
+      
+      - name: Create S3 bucket
+        uses: heyman/docker-run-action@docker-networks
+        with:
+          image: amazon/aws-cli
+          run: --endpoint-url=http://s3:8000 s3api create-bucket test-bucket
+          options: >
+            -e AWS_ACCESS_KEY_ID=access_key
+            -e AWS_SECRET_ACCESS_KEY=secret
       
       - uses: actions/checkout@v2
 
