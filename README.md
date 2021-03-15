@@ -28,6 +28,7 @@ Docker image that periodically dumps a Postgres database, and uploads it to an A
 * `FILENAME`: String that is passed into `strftime()` and used as the backup dump's filename. Defaults to `$DB_NAME_%Y-%m-%d`.
 
 ### Interpolation
+
 Text in `WEBHOOK_DATA` is interpolated with variabels `%(my_var)s`
  - `date`: Date in yyyy-mm-dd format
  - `time`: Date in hh:mm:ss format
@@ -35,16 +36,16 @@ Text in `WEBHOOK_DATA` is interpolated with variabels `%(my_var)s`
  - `filename`: Name of the file uploaded to S3
  - `size`: Size of the backup file with suitable suffix, like MB, GB, ...
 
- ### Send mesages to a Slack webhook.
+#### Example on how to post a Slack message when a backup is complete
 
- Configure a webhook using the Slack's [documentation](https://api.slack.com/messaging/webhooks). Set `WEBHOOK` and `WEBHOOK_` accodringly. 
-
-```
-WEBHOOK=https://hooks.slack.com/services/.../.../...
-WEBHOOK_METHOD=POST
-WEBHOOK_CURL_OPTS=-H 'Content-type: application/json'
-WEBHOOK_DATA={"text":":white_check_mark: Backup completed at %(date)s %(time)s\nDuration: %(duration)s seconds\nUpload: %(filename)s: %(size)s"}
- ```
+1. Configure a webhook as described in the Slack [documentation](https://api.slack.com/messaging/webhooks). 
+2. Set `WEBHOOK` and `WEBHOOK_` accodringly:
+   ```
+   WEBHOOK=https://hooks.slack.com/services/.../.../...
+   WEBHOOK_METHOD=POST
+   WEBHOOK_CURL_OPTS=-H 'Content-type: application/json'
+   WEBHOOK_DATA={"text":":white_check_mark: Backup completed at %(date)s %(time)s\nDuration: %(duration)s seconds\nUpload: %(filename)s: %(size)s"}
+    ```
 
 ## Volumes
 
