@@ -57,7 +57,7 @@ jobs:
         uses: heyman/docker-run-action@docker-networks
         with:
           image: amazon/aws-cli
-          run: aws --endpoint-url=http://s3:8000 s3api create-bucket test-bucket
+          run: aws --endpoint-url=http://s3:8000 s3api create-bucket --bucket test-bucket
           options: >
             -e AWS_ACCESS_KEY_ID=access_key
             -e AWS_SECRET_ACCESS_KEY=secret
