@@ -36,7 +36,7 @@ jobs:
 
     steps:
       - name: Create Test Data
-        uses: addnab/docker-run-action
+        uses: addnab/docker-run-action@main
         with:
           image: postgres:${{ matrix.version }}
           run: >
@@ -54,7 +54,7 @@ jobs:
             -e PGPASSWORD=test
       
       - name: Create S3 bucket
-        uses: addnab/docker-run-action
+        uses: addnab/docker-run-action@main
         with:
           image: amazon/aws-cli
           run: aws --endpoint-url=http://s3:8000 s3api create-bucket --bucket test-postgresql-backup; aws --endpoint-url=http://s3:8000 s3 ls
@@ -73,7 +73,7 @@ jobs:
           context: ${{ matrix.version }}
       
       - name: Take Backup
-        uses: addnab/docker-run-action
+        uses: addnab/docker-run-action@main
         with:
           image: heyman/postgresql-backup:latest
           run: python -u /backup/backup.py
@@ -90,7 +90,7 @@ jobs:
             -e FILENAME=test_${{ matrix.version }}
       
       - name: Clear DB table
-        uses: addnab/docker-run-action
+        uses: addnab/docker-run-action@main
         with:
           image: postgres:${{ matrix.version }}
           run: >
@@ -101,7 +101,7 @@ jobs:
             -e PGPASSWORD=test
       
       - name: Check that table was actually removed
-        uses: addnab/docker-run-action
+        uses: addnab/docker-run-action@main
         with:
           image: postgres:${{ matrix.version }}
           shell: bash
@@ -113,7 +113,7 @@ jobs:
             -e PGPASSWORD=test
       
       - name: Restore Backup
-        uses: addnab/docker-run-action
+        uses: addnab/docker-run-action@main
         with:
           image: heyman/postgresql-backup:latest
           run: python -u /backup/restore.py test_${{ matrix.version }}
@@ -129,7 +129,7 @@ jobs:
             -e AWS_DEFAULT_REGION=us-east-1
       
       - name: Check that table got imported
-        uses: addnab/docker-run-action
+        uses: addnab/docker-run-action@main
         with:
           image: postgres:${{ matrix.version }}
           shell: bash
