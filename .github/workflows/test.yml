@@ -141,14 +141,4 @@ jobs:
               '` ]]
           options: >
             -e PGPASSWORD=test
-      
-      - name: Remove S3 file
-        uses: heyman/docker-run-action@docker-networks
-        with:
-          image: heyman/postgresql-backup:latest
-          run: aws s3 rm s3://test-postgresql-backup/backups/test_${{ matrix.version }}
-          options: >
-            -e S3_EXTRA_OPTIONS='--endpoint-url=http://s3:8000' 
-            -e AWS_ACCESS_KEY_ID=access_key
-            -e AWS_SECRET_ACCESS_KEY=secret
-            -e AWS_DEFAULT_REGION=us-east-1
+
