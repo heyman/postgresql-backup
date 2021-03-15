@@ -57,7 +57,7 @@ jobs:
         uses: heyman/docker-run-action@docker-networks
         with:
           image: amazon/aws-cli
-          run: aws --endpoint-url=http://s3:8000 s3api create-bucket --bucket test-bucket; aws --endpoint-url=http://s3:8000 s3 ls
+          run: aws --endpoint-url=http://s3:8000 s3api create-bucket --bucket test-postgresql-backup; aws --endpoint-url=http://s3:8000 s3 ls
           options: >
             -e AWS_EC2_METADATA_DISABLED=true
             -e AWS_ACCESS_KEY_ID=access_key
@@ -84,8 +84,8 @@ jobs:
             -e DB_USER=test
             -e DB_NAME=test_${{ matrix.version }}
             -e S3_PATH=s3://test-postgresql-backup/backups
-            -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-            -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            -e AWS_ACCESS_KEY_ID=access_key
+            -e AWS_SECRET_ACCESS_KEY=secret
             -e AWS_DEFAULT_REGION=us-east-1
             -e FILENAME=test_${{ matrix.version }}
       
@@ -118,13 +118,14 @@ jobs:
           image: heyman/postgresql-backup:latest
           run: python -u /backup/restore.py test_${{ matrix.version }}
           options: >
+            -e S3_EXTRA_OPTIONS='--endpoint-url=http://s3:8000' 
             -e DB_HOST=postgres
             -e DB_PASS=test
             -e DB_USER=test
             -e DB_NAME=test_${{ matrix.version }}
             -e S3_PATH=s3://test-postgresql-backup/backups
-            -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-            -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            -e AWS_ACCESS_KEY_ID=access_key
+            -e AWS_SECRET_ACCESS_KEY=secret
             -e AWS_DEFAULT_REGION=us-east-1
       
       - name: Check that table got imported
@@ -147,6 +148,7 @@ jobs:
           image: heyman/postgresql-backup:latest
           run: aws s3 rm s3://test-postgresql-backup/backups/test_${{ matrix.version }}
           options: >
-            -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-            -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            -e S3_EXTRA_OPTIONS='--endpoint-url=http://s3:8000' 
+            -e AWS_ACCESS_KEY_ID=access_key
+            -e AWS_SECRET_ACCESS_KEY=secret
             -e AWS_DEFAULT_REGION=us-east-1
