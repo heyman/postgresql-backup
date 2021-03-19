@@ -179,10 +179,13 @@ jobs:
         uses: addnab/docker-run-action@main
         with:
           image: postgres:${{ matrix.version }}
+          shell: bash
           run: >
             psql -d test_${{ matrix.version }} -U test -h postgres -p ${{ job.services.postgres.ports[5432] }} -c '
               DROP TABLE books;
-            '
+            ' && [[ "0" == `psql -d test_${{ matrix.version }} -U test -h postgres -p ${{ job.services.postgres.ports[5432] }} -A -t -c '
+              SELECT count(*) FROM pg_catalog.pg_tables WHERE tablename=$$books$$;
+            '` ]]
           options: >
             -e PGPASSWORD=test
 
