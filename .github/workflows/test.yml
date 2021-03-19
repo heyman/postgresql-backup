@@ -175,3 +175,44 @@ jobs:
           options: >
             -e PGPASSWORD=test
 
+      - name: Clear DB table
+        uses: addnab/docker-run-action@main
+        with:
+          image: postgres:${{ matrix.version }}
+          run: >
+            psql -d test_${{ matrix.version }} -U test -h postgres -p ${{ job.services.postgres.ports[5432] }} -c '
+              DROP TABLE books;
+            '
+          options: >
+            -e PGPASSWORD=test
+
+      - name: Restore Backup (DB_USE_ENV)
+        uses: addnab/docker-run-action@main
+        with:
+          image: heyman/postgresql-backup:latest
+          run: python -u /backup/restore.py test_${{ matrix.version }}
+          options: >
+            -e S3_EXTRA_OPTIONS='--endpoint-url=http://s3:8000' 
+            -e DB_USE_ENV=True
+            -e PGHOST=postgres
+            -e PGPASSWORD=test
+            -e PGUSER=test
+            -e PGDATABASE=test_${{ matrix.version }}
+            -e S3_PATH=s3://test-postgresql-backup/backups
+            -e AWS_ACCESS_KEY_ID=access_key
+            -e AWS_SECRET_ACCESS_KEY=secret
+            -e AWS_DEFAULT_REGION=us-east-1
+
+      - name: Check that table got imported
+        uses: addnab/docker-run-action@main
+        with:
+          image: postgres:${{ matrix.version }}
+          shell: bash
+          run: >
+            [[ "1" == `psql -d test_${{ matrix.version }} -U test -h postgres -p ${{ job.services.postgres.ports[5432] }} -A -t -c '
+                SELECT count(*) FROM pg_catalog.pg_tables WHERE tablename=$$books$$;
+              '` ]] && [[ "Fittstim" == `psql -d test_${{ matrix.version }} -U test -h postgres -p ${{ job.services.postgres.ports[5432] }} -A -t -c '
+                SELECT name FROM books WHERE author=$$Linda Skugge$$;
+              '` ]]
+          options: >
+            -e PGPASSWORD=test
