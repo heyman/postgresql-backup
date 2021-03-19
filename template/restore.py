@@ -56,7 +56,7 @@ def restore_backup():
     else:
         env.update({'PGPASSWORD': DB_PASS, 'PGHOST': DB_HOST, 'PGUSER': DB_USER, 'PGDATABASE': DB_NAME, 'PGPORT': DB_PORT})
 
-    cmd("pg_restore -Fc %s" % (backup_file), env=env)
+    cmd("pg_restore -Fc -d %s %s" % (DB_NAME, backup_file), env=env)
 
 def download_backup():
     cmd("aws s3 cp %s %s%s %s" % (S3_EXTRA_OPTIONS, S3_PATH, file_name, backup_file))
