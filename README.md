@@ -20,6 +20,19 @@ Docker image that periodically dumps a Postgres database, and uploads it to an A
 
 * `S3_STORAGE_CLASS`: Specify [storage class](https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html) for the uploaded object, defaults to `STANDARD_IA`.
 * `S3_EXTRA_OPTIONS`: Specify additional options for S3, e.g. `--endpoint=` for using custom S3 provider.
+* `DB_USE_ENV`: Inject [postgres environment variables](https://www.postgresql.org/docs/13/libpq-envars.html) from the environment. Ignores `DB_HOST`, `DB_PASS`, `DB_USER` and `DB_NAME`. Can be used to specify advanced connections, e.g. using mTLS connection.
+    Example of `--env-file=.env` for container:
+    ```
+        DB_USE_ENV=True
+        PGSSLMODE=verify-full
+        PGSSLROOTCERT=/path/ca.crt
+        PGSSLCERT=<path>/user.crt
+        PGSSLKEY=<path>/user.key
+        PGHOSTADDR=1.2.3.4
+        PGHOST=db.domain.com
+        PGUSER=myuser
+        PGDATABASE=mydb
+    ```
 * `MAIL_TO`: If `MAIL_TO` and `MAIL_FROM` is specified, an e-mail will be sent, using Amazon SES, every time a backup is taken
 * `MAIL_FROM`
 * `WEBHOOK`: If specified, an HTTP request will be sent to this URL
@@ -70,9 +83,10 @@ The following environment variables are required:
 * `AWS_SECRET_ACCESS_KEY`
 * `AWS_DEFAULT_REGION`
 
-### Optional environment variables
+### Other optional environment variables
 
 * `S3_EXTRA_OPTIONS`: Specify additional options for S3, e.g. `--endpoint=` for using custom S3 provider.
+* `DB_USE_ENV`: See [Optional environment variables](#optional-environment-variables) above.
 
 ## Taking a one off backup
 
