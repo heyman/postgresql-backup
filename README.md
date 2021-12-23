@@ -37,7 +37,7 @@ Docker image that periodically dumps a Postgres database, and uploads it to an A
 * `MAIL_FROM`
 * `WEBHOOK`: If specified, an HTTP request will be sent to this URL
 * `WEBHOOK_METHOD`: By default the webhook's HTTP method is GET, but can be changed using this variable
-* `WEBHOOK_CURL_OPTS`: Add additional headers or other option to curl command calling the webhook. E.g. `-H 'Content-type: application/json'`
+* `WEBHOOK_CURL_OPTIONS`: Add additional headers or other option to curl command calling the webhook. E.g. `-H 'Content-type: application/json'`
 * `WEBHOOK_DATA`: Add a body to the webhook being called, unless changed it implies that `POST` method is used. E.g. `{"text":"Backup completed at %(date)s %(time)s!"}`
 * `KEEP_BACKUP_DAYS`: The number of days to keep backups for when pruning old backups. Defaults to `7`.
 * `FILENAME`: String that is passed into `strftime()` and used as the backup dump's filename. Defaults to `$DB_NAME_%Y-%m-%d`.
@@ -58,7 +58,7 @@ Text in `WEBHOOK_DATA` is interpolated with variabels `%(my_var)s`
    ```
    WEBHOOK=https://hooks.slack.com/services/.../.../...
    WEBHOOK_METHOD=POST
-   WEBHOOK_CURL_OPTS=-H 'Content-type: application/json'
+   WEBHOOK_CURL_OPTIONS=-H 'Content-type: application/json'
    WEBHOOK_DATA={"text":":white_check_mark: Backup completed at %(date)s %(time)s\nDuration: %(duration)s seconds\nUpload: %(filename)s: %(size)s"}
     ```
 
