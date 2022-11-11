@@ -62,7 +62,7 @@ def download_backup():
     cmd("aws s3 cp %s %s%s %s" % (S3_EXTRA_OPTIONS, S3_PATH, file_name, backup_file))
 
 def log(msg):
-    print "[%s]: %s" % (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), msg)
+    print("[%s]: %s" % (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), msg))
 
 def main():
     start_time = datetime.now()
