@@ -103,7 +103,9 @@ image.
 The following docker tags are available for this image, and they are based on the corresponding official postgres 
 alpine image:
 
-* `13`, `latest`
+* `15`, `latest`
+* `14`
+* `13`
 * `12`
 * `11`
 * `10`
