@@ -78,7 +78,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: heyman/postgresql-backup:latest
-          run: python -u /backup/backup.py
+          run: python3 -u /backup/backup.py
           options: >
             -e S3_EXTRA_OPTIONS='--endpoint-url=http://s3:8000' 
             -e DB_HOST=postgres
@@ -95,7 +95,7 @@ jobs:
         uses: addnab/docker-run-action@main
         with:
           image: heyman/postgresql-backup:latest
-          run: python -u /backup/backup.py
+          run: python3 -u /backup/backup.py
           options: >
             -e S3_EXTRA_OPTIONS='--endpoint-url=http://s3:8000' 
             -e DB_USE_ENV=True
@@ -151,7 +151,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: heyman/postgresql-backup:latest
-          run: python -u /backup/restore.py test_${{ matrix.version }}
+          run: python3 -u /backup/restore.py test_${{ matrix.version }}
           options: >
             -e S3_EXTRA_OPTIONS='--endpoint-url=http://s3:8000' 
             -e DB_HOST=postgres
@@ -195,7 +195,7 @@ jobs:
         uses: addnab/docker-run-action@main
         with:
           image: heyman/postgresql-backup:latest
-          run: python -u /backup/restore.py test_${{ matrix.version }}
+          run: python3 -u /backup/restore.py test_${{ matrix.version }}
           options: >
             -e S3_EXTRA_OPTIONS='--endpoint-url=http://s3:8000' 
             -e DB_USE_ENV=True
