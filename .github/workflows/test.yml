@@ -109,6 +109,24 @@ jobs:
             -e AWS_DEFAULT_REGION=us-east-1
             -e FILENAME=test_${{ matrix.version }}_env
       
+      - name: Take Backup (running through cron)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: heyman/postgresql-backup:latest
+          run: timeout 65 crond -f -l 2
+          options: >
+            -e S3_EXTRA_OPTIONS='--endpoint-url=http://s3:8000' 
+            -e DB_HOST=postgres
+            -e DB_PASS=test
+            -e DB_USER=test
+            -e DB_NAME=test_${{ matrix.version }}
+            -e S3_PATH=s3://test-postgresql-backup/backups
+            -e AWS_ACCESS_KEY_ID=access_key
+            -e AWS_SECRET_ACCESS_KEY=secret
+            -e AWS_DEFAULT_REGION=us-east-1
+            -e FILENAME=test_${{ matrix.version }}_cron
+            -e CRON_SCHEDULE='* * * * *'
+      
       - name: Check equality
         uses: addnab/docker-run-action@main
         with:
@@ -118,6 +136,7 @@ jobs:
             aws s3 --endpoint-url=http://s3:8000 cp s3://test-postgresql-backup/backups/test_${{ matrix.version }} .
             aws s3 --endpoint-url=http://s3:8000 cp s3://test-postgresql-backup/backups/test_${{ matrix.version }}_env .
             diff test_${{ matrix.version }} test_${{ matrix.version }}_env
+            diff test_${{ matrix.version }} test_${{ matrix.version }}_cron
             echo "$( md5sum test_${{ matrix.version }} |awk '{print $1}') test_${{ matrix.version }}_env"|md5sum -c
           options: >
             -e AWS_EC2_METADATA_DISABLED=true
