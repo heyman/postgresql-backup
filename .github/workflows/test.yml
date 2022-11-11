@@ -10,11 +10,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {version: '15', os: ubuntu-latest}
-          - {version: '14', os: ubuntu-latest}
-          - {version: '13', os: ubuntu-latest}
-          - {version: '12', os: ubuntu-latest}
-          - {version: '11', os: ubuntu-latest}
+          #- {version: '15', os: ubuntu-latest}
+          #- {version: '14', os: ubuntu-latest}
+          #- {version: '13', os: ubuntu-latest}
+          #- {version: '12', os: ubuntu-latest}
+          #- {version: '11', os: ubuntu-latest}
           - {version: '10', os: ubuntu-latest}
 
     services:
@@ -75,12 +75,13 @@ jobs:
           context: ${{ matrix.version }}
       
       - name: Take Backup (running through cron)
-        uses: addnab/docker-run-action@v3
+        uses: heyman/docker-run-action@testing
         with:
           image: heyman/postgresql-backup:latest
-          run: timeout 65 crond -f -l 2
+          run: python3 -u /backup/backup.py
           options: >
-            -e CRON_SCHEDULE='* * * * *'
+            -e TESTZ=1
+            -e "CRON_SCHEDULE"
             -e S3_EXTRA_OPTIONS='--endpoint-url=http://s3:8000' 
             -e DB_HOST=postgres
             -e DB_PASS=test
@@ -91,6 +92,8 @@ jobs:
             -e AWS_SECRET_ACCESS_KEY=secret
             -e AWS_DEFAULT_REGION=us-east-1
             -e FILENAME=test_${{ matrix.version }}
+        env:
+          CRON_SCHEDULE: '* * * * *'
 
       - name: Take Backup (using DB_USE_ENV)
         uses: addnab/docker-run-action@main
