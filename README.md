@@ -4,6 +4,23 @@
 
 Docker image that periodically dumps a Postgres database, and uploads it to an Amazon S3 bucket.
 
+Available on Docker Hub: [heyman/postgresql-backup](https://hub.docker.com/r/heyman/postgresql-backup)
+
+## Example
+
+```
+docker run -it --rm --name=pgbackup \
+    -e CRON_SCHEDULE="* * * * *" \
+    -e DB_HOST=the.db.host \
+    -e DB_USER=username \
+    -e DB_PASS=password \
+    -e DB_NAME=database_name \
+    -e S3_PATH='s3://my-bucket/backups/' \
+    -e AWS_ACCESS_KEY_ID='[aws key id]' \
+    -e AWS_SECRET_ACCESS_KEY='[aws secret key]' \
+    heyman/postgresql-backup:15
+```
+
 ## Required environment variables
 
 * `CRON_SCHEDULE`: The time schedule part of a crontab file (e.g: `15 3 * * *` for every night 03:15)
