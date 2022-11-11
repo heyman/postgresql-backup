@@ -5,7 +5,7 @@ RUN apk update && apk add --no-cache --virtual .build-deps && apk add \
     bash make curl openssh git 
 
 # Install aws-cli
-RUN apk -Uuv add groff less python2 python3 py-pip && pip install awscli
+RUN apk -Uuv add groff less python3 py-pip && pip install awscli
 # Cleanup
 RUN rm /var/cache/apk/*
 
