@@ -58,6 +58,7 @@ docker run -it --rm --name=pgbackup \
 * `WEBHOOK_DATA`: Add a body to the webhook being called, unless changed it implies that `POST` method is used. E.g. `{"text":"Backup completed at %(date)s %(time)s!"}`
 * `KEEP_BACKUP_DAYS`: The number of days to keep backups for when pruning old backups. Defaults to `7`.
 * `FILENAME`: String that is passed into `strftime()` and used as the backup dump's filename. Defaults to `$DB_NAME_%Y-%m-%d`.
+* `PG_DUMP_EXTRA_OPTIONS`: Specify additional options for `pg_dump`, e.g. `--exclude-table-data=table_name` to exclude table data from the dump.
 
 ### Interpolation
 

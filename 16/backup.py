@@ -33,6 +33,7 @@ WEBHOOK_DATA = os.environ.get("WEBHOOK_DATA")
 WEBHOOK_CURL_OPTIONS = os.environ.get("WEBHOOK_CURL_OPTIONS") or ""
 KEEP_BACKUP_DAYS = int(os.environ.get("KEEP_BACKUP_DAYS", 7))
 FILENAME = os.environ.get("FILENAME", DB_NAME + "_%Y-%m-%d")
+PG_DUMP_EXTRA_OPTIONS = os.environ.get("PG_DUMP_EXTRA_OPTIONS") or ""
 
 file_name = dt.strftime(FILENAME)
 backup_file = os.path.join(BACKUP_DIR, file_name)
@@ -69,7 +70,14 @@ def take_backup():
         env.update({'PGPASSWORD': DB_PASS, 'PGHOST': DB_HOST, 'PGUSER': DB_USER, 'PGDATABASE': DB_NAME, 'PGPORT': DB_PORT})
 
     # trigger postgres-backup
-    cmd("pg_dump -Fc > %s" % backup_file, env=env)
+    command = [
+        "pg_dump",
+        "-Fc",
+    ]
+    if PG_DUMP_EXTRA_OPTIONS:
+        command.append(PG_DUMP_EXTRA_OPTIONS)
+    command.append("> %s" % backup_file)
+    cmd(" ".join(command), env=env)
 
 def upload_backup():
     opts = "--storage-class=%s %s" % (S3_STORAGE_CLASS, S3_EXTRA_OPTIONS)
