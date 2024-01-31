@@ -275,10 +275,10 @@ jobs:
           run: python3 -u /backup/restore.py test_${{ matrix.version }}_exclude
           options: >
             -e S3_EXTRA_OPTIONS='--endpoint-url=http://s3:8000' 
-            -e PGHOST=postgres
-            -e PGPASSWORD=test
-            -e PGUSER=test
-            -e PGDATABASE=test_${{ matrix.version }}
+            -e DB_HOST=postgres
+            -e DB_PASS=test
+            -e DB_USER=test
+            -e DB_NAME=test_${{ matrix.version }}
             -e S3_PATH=s3://test-postgresql-backup/backups
             -e AWS_ACCESS_KEY_ID=access_key
             -e AWS_SECRET_ACCESS_KEY=secret
