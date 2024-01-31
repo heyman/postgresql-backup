@@ -121,7 +121,8 @@ image.
 The following docker tags are available for this image, and they are based on the corresponding official postgres 
 alpine image:
 
-* `15`, `latest`
+* `16`, `latest`
+* `15`
 * `14`
 * `13`
 * `12`
