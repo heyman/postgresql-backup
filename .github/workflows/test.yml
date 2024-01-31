@@ -136,7 +136,7 @@ jobs:
             -e AWS_SECRET_ACCESS_KEY=secret
             -e AWS_DEFAULT_REGION=us-east-1
             -e FILENAME=test_${{ matrix.version }}_exclude
-            -e PG_DUMP_EXTRA_OPTIONS='--exclude-table movie*'
+            -e PG_DUMP_EXTRA_OPTIONS='--exclude-table=movies'
       
       - name: Check equality
         uses: addnab/docker-run-action@main
