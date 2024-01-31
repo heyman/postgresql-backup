@@ -2,10 +2,11 @@ FROM postgres:11-alpine
 
 # Install dependencies
 RUN apk update && apk add --no-cache --virtual .build-deps && apk add \
-    bash make curl openssh git 
+    bash make curl openssh git aws-cli
 
-# Install aws-cli
-RUN apk -Uuv add groff less python3 py-pip && pip install awscli
+# Install python
+RUN apk -Uuv add groff less python3
+
 # Cleanup
 RUN rm /var/cache/apk/*
 
