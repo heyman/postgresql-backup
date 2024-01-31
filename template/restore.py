@@ -35,7 +35,7 @@ def cmd(command, **kwargs):
         sys.stderr.write("\n".join([
             "Command execution failed. Output:",
             "-"*80,
-            e.output.decode("utf-8"),
+            e.output.decode(),
             "-"*80,
             ""
         ]))
