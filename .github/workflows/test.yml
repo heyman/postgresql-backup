@@ -160,6 +160,7 @@ jobs:
           run: >
             psql -d test_${{ matrix.version }} -U test -h postgres -p ${{ job.services.postgres.ports[5432] }} -c '
               DROP TABLE books;
+              DROP TABLE movies;
             '
           options: >
             -e PGPASSWORD=test
