@@ -32,7 +32,8 @@ WEBHOOK_METHOD = os.environ.get("WEBHOOK_METHOD")
 WEBHOOK_DATA = os.environ.get("WEBHOOK_DATA")
 WEBHOOK_CURL_OPTIONS = os.environ.get("WEBHOOK_CURL_OPTIONS") or ""
 KEEP_BACKUP_DAYS = int(os.environ.get("KEEP_BACKUP_DAYS", 7))
-FILENAME = os.environ.get("FILENAME", DB_NAME + "_%Y-%m-%d")
+TIMESTAMP_FORMAT = os.environ.get("TIMESTAMP_FORMAT", "%Y-%m-%d")
+FILENAME = os.environ.get("FILENAME", f"{DB_NAME}_{TIMESTAMP_FORMAT}.dump")
 PG_DUMP_EXTRA_OPTIONS = os.environ.get("PG_DUMP_EXTRA_OPTIONS") or ""
 
 file_name = dt.strftime(FILENAME)
@@ -108,7 +109,7 @@ def pretty_bytes(num):
 
 def main():
     start_time = datetime.now()
-    log("Dumping database")
+    log("Dumping database to %s", file_name)
     take_backup()
     backup_size=os.path.getsize(backup_file)
 

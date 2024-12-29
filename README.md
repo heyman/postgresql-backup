@@ -57,7 +57,8 @@ docker run -it --rm --name=pgbackup \
 * `WEBHOOK_CURL_OPTIONS`: Add additional headers or other option to curl command calling the webhook. E.g. `-H 'Content-type: application/json'`
 * `WEBHOOK_DATA`: Add a body to the webhook being called, unless changed it implies that `POST` method is used. E.g. `{"text":"Backup completed at %(date)s %(time)s!"}`
 * `KEEP_BACKUP_DAYS`: The number of days to keep backups for when pruning old backups. Defaults to `7`.
-* `FILENAME`: String that is passed into `strftime()` and used as the backup dump's filename. Defaults to `$DB_NAME_%Y-%m-%d`.
+* `TIMESTAMP_FORMAT`: String that is passed into `strftime()` and used as the timestamp portion of the default `FILENAME`. Defaults to `%Y-%m-%d`. This is ignored if you also provide the `FILENAME`
+* `FILENAME`: String that is passed into `strftime()` and used as the backup dump's filename. Defaults to `$DB_NAME_$TIMESTAMP_FORMAT.dump`.
 * `PG_DUMP_EXTRA_OPTIONS`: Specify additional options for `pg_dump`, e.g. `--exclude-table-data=table_name` to exclude table data from the dump.
 
 ### Interpolation
@@ -71,7 +72,7 @@ Text in `WEBHOOK_DATA` is interpolated with variabels `%(my_var)s`
 
 #### Example on how to post a Slack message when a backup is complete
 
-1. Configure a webhook as described in the Slack [documentation](https://api.slack.com/messaging/webhooks). 
+1. Configure a webhook as described in the Slack [documentation](https://api.slack.com/messaging/webhooks).
 2. Set `WEBHOOK` and `WEBHOOK_` accodringly:
    ```
    WEBHOOK=https://hooks.slack.com/services/.../.../...
@@ -86,8 +87,8 @@ Text in `WEBHOOK_DATA` is interpolated with variabels `%(my_var)s`
 
 ## Restoring a backup
 
-This image can also be run as a one off task to restore one of the backups. 
-To do this, we run the container with the command: `python -u /backup/restore.py [S3-filename]` 
+This image can also be run as a one off task to restore one of the backups.
+To do this, we run the container with the command: `python -u /backup/restore.py [S3-filename]`
 (`S3-filename` should only be the name of the file, the directory is set through the `S3_PATH` env variable).
 
 The following environment variables are required:
@@ -108,17 +109,17 @@ The following environment variables are required:
 
 ## Taking a one off backup
 
-To run a one off backup job, e.g. to test that it works when setting it up for the first time, simply start 
-the container with the docker run command set to `python -u /backup/backup.py` (as well as all the required environment 
+To run a one off backup job, e.g. to test that it works when setting it up for the first time, simply start
+the container with the docker run command set to `python -u /backup/backup.py` (as well as all the required environment
 variables set).
 
 
 ## Docker tags
 
-This image uses the alpine version(s) of the [official postgres](https://hub.docker.com/_/postgres) image as base 
+This image uses the alpine version(s) of the [official postgres](https://hub.docker.com/_/postgres) image as base
 image.
 
-The following docker tags are available for this image, and they are based on the corresponding official postgres 
+The following docker tags are available for this image, and they are based on the corresponding official postgres
 alpine image:
 
 * `16`, `latest`
@@ -128,4 +129,3 @@ alpine image:
 * `12`
 * `11`
 * `10`
-
