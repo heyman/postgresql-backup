@@ -9,11 +9,13 @@ dt = datetime.now()
 
 BACKUP_DIR = os.environ["BACKUP_DIR"]
 
-S3_PATH = os.environ["S3_PATH"]
-S3_STORAGE_CLASS = os.environ.get("S3_STORAGE_CLASS") or "STANDARD_IA"
-S3_EXTRA_OPTIONS = os.environ.get("S3_EXTRA_OPTIONS") or ""
+S3_PATH = os.environ.get("S3_PATH", "")
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+S3_STORAGE_CLASS = os.environ.get("S3_STORAGE_CLASS", "STANDARD_IA")
+S3_EXTRA_OPTIONS = os.environ.get("S3_EXTRA_OPTIONS", "")
 
-DB_USE_ENV = os.environ.get("DB_USE_ENV") or False
+DB_USE_ENV = os.environ.get("DB_USE_ENV", False)
 DB_NAME = os.environ["DB_NAME"] if "DB_NAME" in os.environ else os.environ.get("PGDATABASE")
 
 if not DB_NAME:
@@ -23,17 +25,17 @@ if not DB_USE_ENV:
     DB_HOST = os.environ["DB_HOST"]
     DB_PASS = os.environ["DB_PASS"]
     DB_USER = os.environ["DB_USER"]
-    DB_PORT = os.environ.get("DB_PORT") or "5432"
+    DB_PORT = os.environ.get("DB_PORT", "5432")
 
 MAIL_TO = os.environ.get("MAIL_TO")
 MAIL_FROM = os.environ.get("MAIL_FROM")
 WEBHOOK = os.environ.get("WEBHOOK")
 WEBHOOK_METHOD = os.environ.get("WEBHOOK_METHOD")
 WEBHOOK_DATA = os.environ.get("WEBHOOK_DATA")
-WEBHOOK_CURL_OPTIONS = os.environ.get("WEBHOOK_CURL_OPTIONS") or ""
+WEBHOOK_CURL_OPTIONS = os.environ.get("WEBHOOK_CURL_OPTIONS", "")
 KEEP_BACKUP_DAYS = int(os.environ.get("KEEP_BACKUP_DAYS", 7))
 FILENAME = os.environ.get("FILENAME", DB_NAME + "_%Y-%m-%d")
-PG_DUMP_EXTRA_OPTIONS = os.environ.get("PG_DUMP_EXTRA_OPTIONS") or ""
+PG_DUMP_EXTRA_OPTIONS = os.environ.get("PG_DUMP_EXTRA_OPTIONS", "")
 
 file_name = dt.strftime(FILENAME)
 backup_file = os.path.join(BACKUP_DIR, file_name)
@@ -112,8 +114,12 @@ def main():
     take_backup()
     backup_size=os.path.getsize(backup_file)
 
-    log("Uploading to S3")
-    upload_backup()
+    if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+        log("Uploading to S3")
+        upload_backup()
+    else:
+        log("Skipping S3 upload, no AWS credentials provided")
+
     log("Pruning local backup copies")
     prune_local_backup_files()
     end_time = datetime.now()
