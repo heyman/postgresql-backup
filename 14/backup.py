@@ -109,7 +109,7 @@ def pretty_bytes(num):
 
 def main():
     start_time = datetime.now()
-    log("Dumping database to %s", file_name)
+    log("Dumping database to %s" % file_name)
     take_backup()
     backup_size=os.path.getsize(backup_file)
 
