@@ -1,15 +1,7 @@
 FROM postgres:16-alpine
 
 # Install dependencies
-RUN apk update && apk add --no-cache --virtual .build-deps && apk add \
-    bash make curl openssh git aws-cli
-
-# Install python
-RUN apk -Uuv add groff less python3
-
-# Cleanup
-RUN rm /var/cache/apk/*
-
+RUN apk add --no-cache -uv curl aws-cli python3
 
 VOLUME ["/data/backups"]
 
