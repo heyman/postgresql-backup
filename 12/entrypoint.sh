@@ -7,6 +7,6 @@ if [[ $@ == *crond* ]] && [ -z "$CRON_SCHEDULE" ]; then
 fi
 
 # Write cron schedule
-echo "$CRON_SCHEDULE python3 -u /backup/backup.py > /dev/stdout" > /var/spool/cron/crontabs/root
+echo "$CRON_SCHEDULE python3 -u /backup/backup.py > /dev/stdout" | crontab -
 
 exec "$@"
