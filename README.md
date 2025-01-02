@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/heyman/postgresql-backup/workflows/Test/badge.svg)](https://github.com/heyman/postgresql-backup/actions?query=workflow%3ATest)
 
-Docker image that periodically dumps a Postgres database, and uploads it to an Amazon S3 bucket.
+Docker image that periodically dumps a Postgres database, and optionally uploads it to an Amazon S3 bucket.
 
 Available on Docker Hub: [heyman/postgresql-backup](https://hub.docker.com/r/heyman/postgresql-backup)
 
@@ -28,13 +28,13 @@ docker run -it --rm --name=pgbackup \
 * `DB_PASS`: Postgres password
 * `DB_USER`: Postgres username
 * `DB_NAME`: Name of database
+
+## Optional environment variables
+
 * `S3_PATH`: Amazon S3 path in the format: s3://bucket-name/some/path
 * `AWS_ACCESS_KEY_ID`
 * `AWS_SECRET_ACCESS_KEY`
 * `AWS_DEFAULT_REGION`
-
-## Optional environment variables
-
 * `S3_STORAGE_CLASS`: Specify [storage class](https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html) for the uploaded object, defaults to `STANDARD_IA`.
 * `S3_EXTRA_OPTIONS`: Specify additional options for S3, e.g. `--endpoint=` for using custom S3 provider.
 * `DB_USE_ENV`: Inject [postgres environment variables](https://www.postgresql.org/docs/13/libpq-envars.html) from the environment. Ignores `DB_HOST`, `DB_PASS`, `DB_USER` and `DB_NAME`. Can be used to specify advanced connections, e.g. using mTLS connection.
@@ -71,7 +71,7 @@ Text in `WEBHOOK_DATA` is interpolated with variabels `%(my_var)s`
 
 #### Example on how to post a Slack message when a backup is complete
 
-1. Configure a webhook as described in the Slack [documentation](https://api.slack.com/messaging/webhooks). 
+1. Configure a webhook as described in the Slack [documentation](https://api.slack.com/messaging/webhooks).
 2. Set `WEBHOOK` and `WEBHOOK_` accodringly:
    ```
    WEBHOOK=https://hooks.slack.com/services/.../.../...
@@ -82,13 +82,13 @@ Text in `WEBHOOK_DATA` is interpolated with variabels `%(my_var)s`
 
 ## Volumes
 
-* `/data/backups` - The database is dumped in into this directory
+* `/data/backups` - The database is dumped into this directory
 
 ## Restoring a backup
 
-This image can also be run as a one off task to restore one of the backups. 
-To do this, we run the container with the command: `python -u /backup/restore.py [S3-filename]` 
-(`S3-filename` should only be the name of the file, the directory is set through the `S3_PATH` env variable).
+This image can also be run as a one off task to restore one of the backups.
+To do this, we run the container with the command: `python -u /backup/restore.py [backup-filename]`
+(`backup-filename` should only be the name of the file, the directory is set through the `S3_PATH` env variable, if it needs to be downloaded).
 
 The following environment variables are required:
 
@@ -96,6 +96,9 @@ The following environment variables are required:
 * `DB_PASS`: Postgres password
 * `DB_USER`: Postgres username
 * `DB_NAME`: Name of database to import into
+
+The following environment variables are required if the file to restore is not already in the backup volume:
+
 * `S3_PATH`: Amazon S3 directory path in the format: s3://bucket-name/some/path
 * `AWS_ACCESS_KEY_ID`
 * `AWS_SECRET_ACCESS_KEY`
@@ -108,17 +111,16 @@ The following environment variables are required:
 
 ## Taking a one off backup
 
-To run a one off backup job, e.g. to test that it works when setting it up for the first time, simply start 
-the container with the docker run command set to `python -u /backup/backup.py` (as well as all the required environment 
+To run a one off backup job, e.g. to test that it works when setting it up for the first time, simply start
+the container with the docker run command set to `python -u /backup/backup.py` (as well as all the required environment
 variables set).
-
 
 ## Docker tags
 
-This image uses the alpine version(s) of the [official postgres](https://hub.docker.com/_/postgres) image as base 
+This image uses the alpine version(s) of the [official postgres](https://hub.docker.com/_/postgres) image as base
 image.
 
-The following docker tags are available for this image, and they are based on the corresponding official postgres 
+The following docker tags are available for this image, and they are based on the corresponding official postgres
 alpine image:
 
 * `16`, `latest`
@@ -128,4 +130,3 @@ alpine image:
 * `12`
 * `11`
 * `10`
-

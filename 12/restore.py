@@ -7,10 +7,10 @@ from datetime import datetime
 
 BACKUP_DIR = os.environ["BACKUP_DIR"]
 
-S3_PATH = os.environ["S3_PATH"]
-S3_EXTRA_OPTIONS = os.environ.get("S3_EXTRA_OPTIONS") or ""
+S3_PATH = os.environ.get("S3_PATH", "")
+S3_EXTRA_OPTIONS = os.environ.get("S3_EXTRA_OPTIONS", "")
 
-DB_USE_ENV = os.environ.get("DB_USE_ENV") or False
+DB_USE_ENV = os.environ.get("DB_USE_ENV", False)
 DB_NAME = os.environ["DB_NAME"] if "DB_NAME" in os.environ else os.environ.get("PGDATABASE")
 
 if not DB_NAME:
@@ -20,7 +20,7 @@ if not DB_USE_ENV:
     DB_HOST = os.environ["DB_HOST"]
     DB_PASS = os.environ["DB_PASS"]
     DB_USER = os.environ["DB_USER"]
-    DB_PORT = os.environ.get("DB_PORT") or "5432"
+    DB_PORT = os.environ.get("DB_PORT", "5432")
 
 file_name = sys.argv[1]
 backup_file = os.path.join(BACKUP_DIR, file_name)
@@ -48,7 +48,7 @@ def restore_backup():
     if not backup_exists():
         sys.stderr.write("Backup file doesn't exists!\n")
         sys.exit(1)
-    
+
     # restore postgres-backup
     env = os.environ.copy()
     if DB_USE_ENV:
@@ -71,10 +71,10 @@ def main():
     else:
         log("Downloading database dump")
         download_backup()
-    
+
     log("Restoring database")
     restore_backup()
-    
+
     log("Restore complete, took %.2f seconds" % (datetime.now() - start_time).total_seconds())
 
 if __name__ == "__main__":
