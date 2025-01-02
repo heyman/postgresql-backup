@@ -13,10 +13,10 @@ RUN rm /var/cache/apk/*
 
 VOLUME ["/data/backups"]
 
-ENV BACKUP_DIR /data/backups
+ENV BACKUP_DIR=/data/backups
 
 ADD . /backup
 
 ENTRYPOINT ["/backup/entrypoint.sh"]
 
-CMD crond -f -l 2
+CMD ["crond", "-f", "-l", "2"]
